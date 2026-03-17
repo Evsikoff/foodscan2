@@ -3,8 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const path = req.query.path;
-  const targetPath = Array.isArray(path) ? path.join('/') : path;
+  const targetPath = req.query.path || '';
   const targetUrl = `https://api.z.ai/api/paas/v4/${targetPath}`;
 
   try {
