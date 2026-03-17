@@ -1,15 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Panel, PanelHeader, Group, Button, Div, Title, Text,
   Caption, Snackbar, Avatar, SimpleCell, Separator,
-  Headline, Subhead
+  Headline, Subhead, PanelHeaderBack
 } from '@vkontakte/vkui';
 import {
-  Icon28CameraOutline, Icon28RefreshOutline, Icon24ErrorCircleOutline
+  Icon28CameraOutline, Icon28RefreshOutline, Icon24ErrorCircleOutline,
+  Icon28HistoryBackwardOutline
 } from '@vkontakte/icons';
 import { analyzeFood } from './api/analyzeFood';
 import { showInterstitialAd } from './utils/vkAds';
 import { MACRO_COLORS, MACRO_LABELS } from './constants/prompts';
+import { loadHistory, saveToHistory } from './utils/vkStorage';
 
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
@@ -18,7 +20,12 @@ export default function App() {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [snackbar, setSnackbar] = useState(null);
   const [thinkingText, setThinkingText] = useState('');
+  const [history, setHistory] = useState([]);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    loadHistory().then(setHistory);
+  }, []);
 
   const showError = (text) => {
     setSnackbar(
@@ -50,6 +57,15 @@ export default function App() {
       if (parsed.is_food) {
         setResult(parsed);
         setActivePanel('food_result');
+        const entry = {
+          name: parsed.name,
+          calories: parsed.calories,
+          proteins: parsed.proteins,
+          fats: parsed.fats,
+          carbs: parsed.carbs,
+          date: new Date().toISOString(),
+        };
+        saveToHistory(entry).then(setHistory);
       } else {
         setInsult(parsed.insult);
         setActivePanel('insult_result');
