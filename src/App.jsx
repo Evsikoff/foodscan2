@@ -9,7 +9,7 @@ import {
   Icon28HistoryBackwardOutline, Icon28DeleteOutline, Icon24ChevronRight
 } from '@vkontakte/icons';
 import { analyzeFood } from './api/analyzeFood';
-import { showInterstitialAd } from './utils/vkAds';
+import { showNativeAd } from './utils/vkAds';
 import { MACRO_COLORS, MACRO_LABELS } from './constants/prompts';
 import { loadHistory, saveToHistory, removeFromHistory } from './utils/vkStorage';
 
@@ -49,7 +49,7 @@ export default function App() {
 
     try {
       setThinkingText('');
-      showInterstitialAd();
+      showNativeAd();
       setIsFromHistory(false);
 
       const parsed = await analyzeFood(file, (reasoning) => {
@@ -155,7 +155,7 @@ export default function App() {
                 borderRadius: 12, marginBottom: 16
               }}
             >
-              Сканировать еду
+              Анализировать фото 📺
             </Button>
 
             {history.length > 0 && (
