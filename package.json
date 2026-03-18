@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.59.0",
     "@vkontakte/icons": "^2.18.0",
     "@vkontakte/vk-bridge": "^2.15.11",
     "@vkontakte/vkui": "^7.0.0",
