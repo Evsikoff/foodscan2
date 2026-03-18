@@ -1,7 +1,7 @@
 import bridge from '@vkontakte/vk-bridge';
 
 const HISTORY_KEY = 'scan_history';
-const MAX_ITEMS = 30;
+const MAX_ITEMS = 90;
 
 export async function loadHistory() {
   try {
@@ -18,11 +18,27 @@ export async function loadHistory() {
 
 export async function saveToHistory(entry) {
   const history = await loadHistory();
-  history.unshift(entry);
+  // Ensure date and ID are set
+  const entryWithMetadata = {
+    ...entry,
+    id: Date.now() + Math.random().toString(36).substr(2, 9),
+    date: entry.date || new Date().toISOString()
+  };
+  history.unshift(entryWithMetadata);
   if (history.length > MAX_ITEMS) history.length = MAX_ITEMS;
   await bridge.send('VKWebAppStorageSet', {
     key: HISTORY_KEY,
     value: JSON.stringify(history),
   });
   return history;
+}
+
+export async function removeFromHistory(id) {
+  const history = await loadHistory();
+  const updatedHistory = history.filter(item => item.id !== id);
+  await bridge.send('VKWebAppStorageSet', {
+    key: HISTORY_KEY,
+    value: JSON.stringify(updatedHistory),
+  });
+  return updatedHistory;
 }
