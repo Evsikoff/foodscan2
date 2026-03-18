@@ -106,7 +106,7 @@ export default function App() {
               🍔
             </div>
             <Title level="1" style={{ marginBottom: 8 }}>Нейросканер еды</Title>
-            <Text style={{ color: '#888', marginBottom: 24 }}>
+            <Text style={{ color: 'var(--vkui--color_text_secondary)', marginBottom: 24 }}>
               Сфотографируй еду — узнай калории за секунды
             </Text>
 
@@ -134,8 +134,8 @@ export default function App() {
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
               {['⚡ Быстро', '🎯 Точно', '🤖 ИИ'].map((t) => (
                 <span key={t} style={{
-                  background: '#f0f0f0', borderRadius: 20,
-                  padding: '6px 14px', fontSize: 13, color: '#555'
+                  background: 'var(--vkui--color_background_secondary)', borderRadius: 20,
+                  padding: '6px 14px', fontSize: 13, color: 'var(--vkui--color_text_secondary)'
                 }}>{t}</span>
               ))}
             </div>
@@ -144,7 +144,7 @@ export default function App() {
 
         <Caption
           level="2"
-          style={{ textAlign: 'center', color: '#999', padding: '0 20px 20px' }}
+          style={{ textAlign: 'center', color: 'var(--vkui--color_text_tertiary)', padding: '0 20px 20px' }}
         >
           ⚠️ ИИ может ошибаться. Данные являются приблизительными и не заменяют консультацию диетолога.
         </Caption>
@@ -167,29 +167,29 @@ export default function App() {
             )}
             <div style={{
               width: 48, height: 48, margin: '20px auto',
-              border: '4px solid #f0f0f0', borderTopColor: '#FF6B6B',
+              border: '4px solid var(--vkui--color_background_secondary)', borderTopColor: '#FF6B6B',
               borderRadius: '50%',
               animation: 'spin 0.8s linear infinite'
             }} />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <Title level="2" style={{ marginBottom: 8 }}>Анализируем фото...</Title>
-            <Text style={{ color: '#888' }}>
+            <Text style={{ color: 'var(--vkui--color_text_secondary)' }}>
               ИИ определяет состав и калорийность
             </Text>
             {thinkingText && (
               <div style={{
                 marginTop: 16, padding: '12px 16px',
-                background: '#f5f5f5', borderRadius: 12,
+                background: 'var(--vkui--color_background_secondary)', borderRadius: 12,
                 maxHeight: 120, overflow: 'auto',
                 textAlign: 'left'
               }}>
-                <Caption level="2" style={{ color: '#aaa', marginBottom: 4 }}>🧠 ИИ думает:</Caption>
-                <Text style={{ fontSize: 12, color: '#888', lineHeight: '1.4' }}>
+                <Caption level="2" style={{ color: 'var(--vkui--color_text_tertiary)', marginBottom: 4 }}>🧠 ИИ думает:</Caption>
+                <Text style={{ fontSize: 12, color: 'var(--vkui--color_text_secondary)', lineHeight: '1.4' }}>
                   {thinkingText.length > 200 ? '...' + thinkingText.slice(-200) : thinkingText}
                 </Text>
               </div>
             )}
-            <Caption level="2" style={{ color: '#aaa', marginTop: 16 }}>
+            <Caption level="2" style={{ color: 'var(--vkui--color_text_tertiary)', marginTop: 16 }}>
               📺 Пока показываем рекламу — спасибо за поддержку!
             </Caption>
           </Div>
@@ -232,7 +232,7 @@ export default function App() {
                   <div style={{ fontSize: 42, fontWeight: 800, color: '#FF6B6B' }}>
                     {result.calories}
                   </div>
-                  <Subhead style={{ color: '#888' }}>ккал на порцию</Subhead>
+                  <Subhead style={{ color: 'var(--vkui--color_text_secondary)' }}>ккал на порцию</Subhead>
                 </div>
 
                 <Headline weight="2" style={{ marginBottom: 12 }}>Макронутриенты</Headline>
@@ -243,7 +243,7 @@ export default function App() {
                       <Text style={{ fontSize: 14, fontWeight: 600 }}>{result[key] ?? 0} г</Text>
                     </div>
                     <div style={{
-                      height: 8, borderRadius: 4, background: '#f0f0f0', overflow: 'hidden'
+                      height: 8, borderRadius: 4, background: 'var(--vkui--color_background_secondary)', overflow: 'hidden'
                     }}>
                       <div style={{
                         height: '100%', borderRadius: 4,
@@ -264,8 +264,8 @@ export default function App() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {result.ingredients.map((ing, i) => (
                       <span key={i} style={{
-                        background: '#f0f0f0', borderRadius: 20,
-                        padding: '6px 14px', fontSize: 13
+                        background: 'var(--vkui--color_background_secondary)', borderRadius: 20,
+                        padding: '6px 14px', fontSize: 13, color: 'var(--vkui--color_text_primary)'
                       }}>{ing}</span>
                     ))}
                   </div>
@@ -286,7 +286,7 @@ export default function App() {
               )}
             </Group>
 
-            <Caption level="2" style={{ textAlign: 'center', color: '#999', padding: '0 20px 8px' }}>
+            <Caption level="2" style={{ textAlign: 'center', color: 'var(--vkui--color_text_tertiary)', padding: '0 20px 8px' }}>
               ⚠️ ИИ может ошибаться. Данные приблизительные.
             </Caption>
 
@@ -327,7 +327,7 @@ export default function App() {
               <div style={{
                 width: 120, height: 120, borderRadius: 16, overflow: 'hidden',
                 margin: '0 auto 20px', opacity: 0.6,
-                border: '3px dashed #ccc'
+                border: '3px dashed var(--vkui--color_icon_tertiary)'
               }}>
                 <img src={photoPreview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
@@ -347,7 +347,7 @@ export default function App() {
           </Div>
         </Group>
 
-        <Caption level="2" style={{ textAlign: 'center', color: '#999', padding: '0 20px 20px' }}>
+        <Caption level="2" style={{ textAlign: 'center', color: 'var(--vkui--color_text_tertiary)', padding: '0 20px 20px' }}>
           ⚠️ ИИ может ошибаться. Данные приблизительные.
         </Caption>
         {snackbar}
