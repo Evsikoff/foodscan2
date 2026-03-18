@@ -6,12 +6,12 @@ import {
 } from '@vkontakte/vkui';
 import {
   Icon28CameraOutline, Icon28RefreshOutline, Icon24ErrorCircleOutline,
-  Icon28HistoryBackwardOutline
+  Icon28HistoryBackwardOutline, Icon28DeleteOutline, Icon24ChevronRight
 } from '@vkontakte/icons';
 import { analyzeFood } from './api/analyzeFood';
 import { showInterstitialAd } from './utils/vkAds';
 import { MACRO_COLORS, MACRO_LABELS } from './constants/prompts';
-import { loadHistory, saveToHistory } from './utils/vkStorage';
+import { loadHistory, saveToHistory, removeFromHistory } from './utils/vkStorage';
 
 export default function App() {
   const [activePanel, setActivePanel] = useState('home');
@@ -21,6 +21,7 @@ export default function App() {
   const [snackbar, setSnackbar] = useState(null);
   const [thinkingText, setThinkingText] = useState('');
   const [history, setHistory] = useState([]);
+  const [isFromHistory, setIsFromHistory] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function App() {
     try {
       setThinkingText('');
       showInterstitialAd();
+      setIsFromHistory(false);
 
       const parsed = await analyzeFood(file, (reasoning) => {
         setThinkingText(reasoning);
@@ -63,7 +65,6 @@ export default function App() {
           proteins: parsed.proteins,
           fats: parsed.fats,
           carbs: parsed.carbs,
-          date: new Date().toISOString(),
         };
         saveToHistory(entry).then(setHistory);
       } else {
@@ -83,12 +84,38 @@ export default function App() {
     setResult(null);
     setInsult('');
     setPhotoPreview(null);
+    setIsFromHistory(false);
     setActivePanel('home');
   };
 
-  const maxMacro = result
+  const handleDeleteHistoryItem = async (e, id) => {
+    e.stopPropagation();
+    const updatedHistory = await removeFromHistory(id);
+    setHistory(updatedHistory);
+  };
+
+  const handleSelectHistoryItem = (item) => {
+    setResult(item);
+    setPhotoPreview(null); // We don't store images in history for now (VK Storage limit)
+    setIsFromHistory(true);
+    setActivePanel('food_result');
+  };
+
+  const maxMacro = React.useMemo(() => result
     ? Math.max(result.proteins || 0, result.fats || 0, result.carbs || 0, result.fiber || 0, result.sugar || 0, 1)
-    : 1;
+    : 1, [result]);
+
+  const groupedHistory = React.useMemo(() => history.reduce((acc, item) => {
+    const date = new Date(item.date).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    if (!acc[date]) {
+      acc[date] = { items: [], totalCalories: 0 };
+    }
+    acc[date].items.push(item);
+    acc[date].totalCalories += item.calories || 0;
+    return acc;
+  }, {}), [history]);
 
   return (
     <View activePanel={activePanel}>
@@ -130,6 +157,19 @@ export default function App() {
             >
               Сканировать еду
             </Button>
+
+            {history.length > 0 && (
+              <Button
+                size="l"
+                stretched
+                mode="secondary"
+                before={<Icon28HistoryBackwardOutline />}
+                onClick={() => setActivePanel('history')}
+                style={{ borderRadius: 12, marginBottom: 16 }}
+              >
+                История сканирований
+              </Button>
+            )}
 
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
               {['⚡ Быстро', '🎯 Точно', '🤖 ИИ'].map((t) => (
@@ -198,7 +238,11 @@ export default function App() {
 
       {/* FOOD RESULT */}
       <Panel id="food_result">
-        <PanelHeader>Результат</PanelHeader>
+        <PanelHeader
+          before={isFromHistory ? <PanelHeaderBack onClick={() => setActivePanel('history')} /> : null}
+        >
+          Результат
+        </PanelHeader>
         {result && (
           <>
             {photoPreview && (
@@ -291,6 +335,18 @@ export default function App() {
             </Caption>
 
             <Div>
+              {history.length > 0 && (
+                <Button
+                  size="l"
+                  stretched
+                  mode="secondary"
+                  before={<Icon28HistoryBackwardOutline />}
+                  onClick={() => setActivePanel('history')}
+                  style={{ borderRadius: 12, marginBottom: 12 }}
+                >
+                  История сканирований
+                </Button>
+              )}
               <Button
                 size="l" stretched mode="secondary"
                 before={<Icon28RefreshOutline />}
@@ -351,6 +407,50 @@ export default function App() {
           ⚠️ ИИ может ошибаться. Данные приблизительные.
         </Caption>
         {snackbar}
+      </Panel>
+
+      {/* HISTORY */}
+      <Panel id="history">
+        <PanelHeader before={<PanelHeaderBack onClick={() => setActivePanel('home')} />}>
+          История
+        </PanelHeader>
+        {Object.keys(groupedHistory).length === 0 ? (
+          <Div style={{ textAlign: 'center', marginTop: 40 }}>
+            <Text style={{ color: '#888' }}>История пока пуста</Text>
+          </Div>
+        ) : (
+          Object.entries(groupedHistory).map(([date, data]) => (
+            <Group key={date} header={
+              <Div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 0 }}>
+                <Headline weight="2">{date}</Headline>
+                <Caption level="1" style={{ color: '#FF6B6B', fontWeight: 600 }}>
+                  {data.totalCalories} ккал
+                </Caption>
+              </Div>
+            }>
+              {data.items.map((item) => (
+                <SimpleCell
+                  key={item.id}
+                  onClick={() => handleSelectHistoryItem(item)}
+                  after={
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Text style={{ marginRight: 8, color: '#888' }}>{item.calories} ккал</Text>
+                      <Icon28DeleteOutline
+                        width={24} height={24}
+                        style={{ color: '#E53935' }}
+                        onClick={(e) => handleDeleteHistoryItem(e, item.id)}
+                      />
+                      <Icon24ChevronRight style={{ color: '#BBB' }} />
+                    </div>
+                  }
+                  subtitle={`${item.proteins}П · ${item.fats}Ж · ${item.carbs}У`}
+                >
+                  {item.name}
+                </SimpleCell>
+              ))}
+            </Group>
+          ))
+        )}
       </Panel>
     </View>
   );
