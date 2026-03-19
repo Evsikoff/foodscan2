@@ -5,7 +5,9 @@ import bridge from '@vkontakte/vk-bridge';
 import '@vkontakte/vkui/dist/vkui.css';
 import App from './App';
 
-bridge.send('VKWebAppInit');
+if (bridge.supports('VKWebAppInit')) {
+  bridge.send('VKWebAppInit');
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ConfigProvider>
